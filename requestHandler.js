@@ -1,5 +1,6 @@
 const fs = require('fs');
-const main_view = fs.readFileSync('./main.html');
+const main_view = fs.readFileSync('./main.html', 'utf-8');
+const orderlist_view = fs.readFileSync('./orderlist.html', 'utf-8');
 
 const mariadb = require('./database/connect/mariadb');
 
@@ -54,18 +55,16 @@ function orderlist(response) {
     console.log('orderlist');
     response.writeHead(200, {'Content-Type' : 'text/html'});
 
-    fs.readFile('./orderlist.html', 'utf8', function(err, orderlist_view) {
-        mariadb.query("SELECT * FROM orderlist", function(err, rows) {
-            response.write(orderlist_view.split('<!-- data location -->')[0]);
-            rows.forEach(element => {
-                response.write("<tr>" 
-                            + "<td>" + element.product_id + "</td>"
-                            + "<td>" + element.order_date + "</td>"
-                            + "</tr>");
-            });
-            response.write(orderlist_view.split('<!-- data location -->')[1]);
-            response.end();
+    mariadb.query("SELECT * FROM orderlist", function(err, rows) {
+        response.write(orderlist_view.split('<!-- data location -->')[0]);
+        rows.forEach(element => {
+            response.write("<tr>" 
+                        + "<td>" + element.product_id + "</td>"
+                        + "<td>" + element.order_date + "</td>"
+                        + "</tr>");
         });
+        response.write(orderlist_view.split('<!-- data location -->')[1]);
+        response.end();
     });
 }
 
